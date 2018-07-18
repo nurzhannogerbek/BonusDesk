@@ -1,0 +1,144 @@
+{% extends "base.html" %}
+
+{% load static %}
+{% load payment_status %}
+
+{% block style %}
+    <link rel="stylesheet" href="{% static 'css/autocomplete_bootstrap.css' %}"/>
+{% endblock %}
+
+{% block title %}Личный кабинет{% endblock %}
+
+{% block header %}{% include 'header.html' %}{% endblock %}
+
+{% block content %}
+    {% if user.is_superuser %}
+        <div class="container" id="search-container">
+            <div class="card text-center bg-light mt-3 mb-3">
+                <div class="card-header text-uppercase">
+                    <i class="fa fa-search" aria-hidden="true"></i>&nbsp;<span>Поиск</span></div>
+                <div class="card-body">
+                    <form class="form-inline search-form">
+                        <div class="form-group flex">
+                            <input type="text" class="form-control mr-sm-2" id="username" placeholder="Введите логин...">
+                            <button type="button" class="btn btn-primary" id="search-user-btn">Искать</button>
+                        </div>
+                    </form>
+                    <p class="card-text mt-3">
+                        <i class="fa fa-info-circle" aria-hidden="true"></i>&nbsp;<span>Чтобы вывести информацию о пользователе, введите логин (username) этого пользователя.</span>
+                    </p>
+                </div>
+            </div>
+        </div>
+        <div class="container" id="error-message">
+            <div class="alert alert-danger text-center" role="alert">
+                <i class="fa fa-exclamation-triangle"
+                   aria-hidden="true"></i>&nbsp;<span><strong>ERROR</strong></span><br><span>Попробуйте ввести логин пользователя еще раз!</span><br><span>Вероятно пользователя с подобным логином нет в системе.</span>
+            </div>
+        </div>
+        <div class="card" id="loading-icon">
+            <div class="card-body text-center">
+                <i class="fa fa-cog fa-spin fa-3x fa-fw"></i>
+            </div>
+        </div>
+        <div id="user-information"></div>
+    {% else %}
+        {% include 'dashboard_block.html' %}
+        <div id="specify-parent-modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby=""
+             aria-hidden="true">
+            <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+                <div class="modal-content">
+                </div>
+            </div>
+        </div>
+    {% endif %}
+{% endblock %}
+
+{% block script %}
+    <script type="text/javascript" src="{% static 'js/specify_parent.js' %}"></script>
+    <script type="text/javascript" src="{% static 'js/nestable.js' %}"></script>
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $("#referrals").nestable({
+                maxDepth: 4,
+                noDragClass: 'dd-nodrag',
+            });
+        });
+    </script>
+    {% if user.is_superuser %}
+        <script type="text/javascript"
+                src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
+        <script type="text/javascript">
+            $("#username").autocomplete({
+                source: "{% url 'username_autocomplete' %}",
+                minLength: 2,
+                select: function (event, ui) {
+                    $("#username").val(ui.item.value);
+                    return false;
+                },
+                open: function () {
+                    $("ul.ui-menu").width($(this).innerWidth());
+                }
+            });
+        </script>
+        <script type="text/javascript">
+            $.ajaxSetup({
+                headers: {"X-CSRFToken": '{{csrf_token}}'}
+            });
+            $("#search-user-btn").click(function () {
+                $('#loading-icon').fadeIn();
+                var username = $("#username").val();
+                $.ajax({
+                    url: "/dashboard/search_user_information/" + username + "/",
+                    type: "post",
+                    contentType: 'application/json; charset= utf-8',
+                    dataType: 'json',
+                    data: {'username': username},
+                    success: function (data) {
+                        $('#error-message').hide();
+                        $('#user-information').show();
+                        $("#user-information").html(data.dashboard_block_about_user);
+                        $("#referrals").nestable({
+                            maxDepth: 4,
+                            noDragClass: 'dd-nodrag',
+                        });
+                        $(function () {
+                            let $btnCopy = $('#copy-referral-link-btn');
+                            $btnCopy.on('click', function () {
+                                let clipboard = new ClipboardJS('#copy-referral-link-btn');
+                                clipboard.on('success', function (e) {
+                                    $btnCopy.text("Сохранено в буфере обмена");
+                                    setTimeout(function () {
+                                        $btnCopy.text('Копировать реферальную ссылку');
+                                    }, 2000);
+                                });
+                            });
+                        });
+                    },
+                    error: function (jqXHR, textStatus, errorThrown) {
+                        $('#error-message').show();
+                        $('#loading-icon').hide();
+                        $('#user-information').hide();
+                    }
+                }).done(function (data, textStatus, jqXHR) {
+                    $('#loading-icon').fadeOut();
+                });
+            });
+        </script>
+    {% endif %}
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.0/clipboard.min.js"></script>
+    <script>
+        $(function () {
+            let $btnCopy = $('#copy-referral-link-btn');
+            $btnCopy.on('click', function () {
+                let clipboard = new ClipboardJS('#copy-referral-link-btn');
+                clipboard.on('success', function (e) {
+                    $btnCopy.text("Сохранено в буфер обмена");
+                    setTimeout(function () {
+                        $btnCopy.text('Копировать реферальную ссылку');
+                    }, 2000);
+                });
+            });
+        });
+    </script>
+{% endblock %}

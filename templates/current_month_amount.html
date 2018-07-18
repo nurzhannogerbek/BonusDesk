@@ -1,0 +1,38 @@
+<div class="card-header">
+    <i class="fa fa-bar-chart info-icons" aria-hidden="true"></i>
+</div>
+<div class="card-body">
+    <h1 class="card-title pricing-card-title">{{ current_month_amount }}</h1>
+    <ul class="list-unstyled mt-3 mb-4">
+        <li>
+            Накопленная сумма за текущий
+            {% now "m" as current_mount %}
+            {% if current_mount == "01" %}
+                Январь
+            {% elif current_mount == "02" %}
+                Февраль
+            {% elif current_mount == "03" %}
+                Март
+            {% elif current_mount == "04" %}
+                Апрель
+            {% elif current_mount == "05" %}
+                Май
+            {% elif current_mount == "06" %}
+                Июнь
+            {% elif current_mount == "07" %}
+                Июль
+            {% elif current_mount == "08" %}
+                Август
+            {% elif current_mount == "09" %}
+                Сентябрь
+            {% elif current_mount == "10" %}
+                Октябрь
+            {% elif current_mount == "11" %}
+                Ноябрь
+            {% elif current_mount == "12" %}
+                Декабрь
+            {% endif %}
+            месяц
+        </li>
+    </ul>
+</div>

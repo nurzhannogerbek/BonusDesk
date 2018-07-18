@@ -1,0 +1,420 @@
+{% load static %}
+{% load mptt_tags %}
+{% load payment_status %}
+
+{# START: Referral Link Section #}
+{% if request_user.is_superuser %}
+    <main role="main" style="margin-top: 2rem;">
+        <section class="jumbotron text-center">
+            <div class="container">
+                <h2 class="jumbotron-heading">Реферальная ссылка пользователя {{ user.username }}</h2>
+                <p class="lead text-muted referral-link">
+                    <i class="fa fa-link" aria-hidden="true"></i>
+                    &nbsp;
+                    <span>https://enjoyjumping.com/referrals/{{ referral_code.code }}/</span>
+                </p>
+                <button id="copy-referral-link-btn" class="btn btn-success mb-2" data-toggle="tooltip" data-placement="top" data-clipboard-text="https://enjoyjumping.com/referrals/{{ referral_code.code }}/">
+                    <span>Копировать реферальную ссылку</span>
+                </button>
+                <br>
+                <a class="btn btn-lg btn-success" href="{% url 'admin:index' %}">Редактировать</a>
+            </div>
+        </section>
+    </main>
+{% else %}
+    <main role="main">
+        <section class="jumbotron text-center">
+            <div class="container">
+                <h2 class="jumbotron-heading">Ваша уникальная реферальная ссылка</h2>
+                <p class="lead text-muted referral-link">
+                    <i class="fa fa-link" aria-hidden="true"></i>
+                    &nbsp;
+                    <span>https://enjoyjumping.com/referrals/{{ referral_code.code }}/</span>
+                </p>
+                <button id="copy-referral-link-btn" class="btn btn-success" data-toggle="tooltip" data-placement="top" data-clipboard-text="https://enjoyjumping.com/referrals/{{ referral_code.code }}/">
+                    <span>Копировать реферальную ссылку</span>
+                </button>
+                <p class="mt-3">Поделиться:</p>
+                <ul class="social-icons icon-rounded  list-unstyled list-inline">
+                    <li>
+                        <a href='http://vk.com/share.php?url={{ user.referral_codes.all.0.url }}' target='_blank' rel='nofollow'>
+                            <i class="fa fa-vk"></i>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="https://www.facebook.com/sharer/sharer.php?u={{ user.referral_codes.all.0.url }}" target='_blank' rel='nofollow'>
+                            <i class="fa fa-facebook"></i>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="https://twitter.com/share?url={{ user.referral_codes.all.0.url }}" target='_blank' rel='nofollow'>
+                            <i class="fa fa-twitter"></i>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="https://plus.google.com/share?url={{ user.referral_codes.all.0.url }}" target='_blank' rel='nofollow'>
+                            <i class="fa fa-google-plus"></i>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </section>
+    </main>
+{% endif %}
+{# END: Referral Link Section #}
+
+{% if request_user.is_superuser %}
+    {# START: Information #}
+    <div class="container">
+        <div class="card-deck mb-3 text-center">
+            <div class="card mb-4 box-shadow">
+                <div class="card-header">
+                    <i class="fa fa-line-chart info-icons" aria-hidden="true"></i>
+                </div>
+                <div class="card-body">
+                    <h1 class="card-title pricing-card-title">
+                        {% if last_month_amount %}{{ last_month_amount }}{% else %}0{% endif %}</h1>
+                    <ul class="list-unstyled mt-3 mb-4">
+                        <li>Сумма накопленная за предыдущие месяцы</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="card mb-4 box-shadow" id="current-month-amount-block">
+                {% include 'current_month_amount.html' %}
+            </div>
+            <div class="card mb-4 box-shadow" id="accumulate-block">
+                {% include 'accumulate.html' %}
+            </div>
+            <div class="card mb-4 box-shadow" id="amount-block">
+                {% include 'amount.html' %}
+            </div>
+        </div>
+    </div>
+    <div class="container">
+        <div class="card-deck mb-3 text-center">
+            <div class="card mb-4 box-shadow">
+                <div class="card-header">
+                    <i class="fa fa-users info-icons" aria-hidden="true"></i>
+                </div>
+                <div class="card-body">
+                    <h1 class="card-title pricing-card-title">{{ referrals_count }}</h1>
+                    <ul class="list-unstyled mt-3 mb-4">
+                        {% if request_user.is_superuser %}
+                            <li>Количество последователей</li>
+                        {% else %}
+                            <li>Количество ваших последователей</li>
+                        {% endif %}
+                    </ul>
+                </div>
+            </div>
+            <div class="card mb-4 box-shadow">
+                <div class="card-header">
+                    <i class="fa fa-user-plus info-icons" aria-hidden="true"></i>
+                </div>
+                <div class="card-body">
+                    <h1 class="card-title pricing-card-title">{{ bonus_referral_count }}</h1>
+                    <ul class="list-unstyled mt-3 mb-4">
+                        <li>Количество активных последователей за этот месяц</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="container">
+        <div class="card-deck mb-3 text-center">
+            <div class="card mb-4 box-shadow">
+                <div class="card-header">
+                    <h4 class="my-0 font-weight-normal">1 уровень</h4>
+                </div>
+                <div class="card-body">
+                    <ul class="list-unstyled mt-3 mb-4">
+                        <li>Количество последователей первого уровня: {{ first_level_referral_count }}</li>
+                        <li>Активных последователей: {{ first_level_bonus_referral_count }}</li>
+                        {% if request_user.is_superuser %}
+                            <li>За текущий месяц {{ user }} заработал(a): {{ first_level_amount }}</li>
+                        {% else %}
+                            <li>За текущий месяц вы заработали: {{ first_level_amount }}</li>
+                        {% endif %}
+                    </ul>
+                </div>
+            </div>
+            <div class="card mb-4 box-shadow">
+                <div class="card-header">
+                    <h4 class="my-0 font-weight-normal">2 уровень</h4>
+                </div>
+                <div class="card-body">
+                    <ul class="list-unstyled mt-3 mb-4">
+                        <li>Количество последователей второго уровня: {{ second_level_referral_count }}</li>
+                        <li>Активных последователей: {{ second_level_bonus_referral_count }}</li>
+                        {% if request_user.is_superuser %}
+                            <li>За текущий месяц {{ user }} заработал(a): {{ second_level_amount }}</li>
+                        {% else %}
+                            <li>За текущий месяц вы заработали: {{ second_level_amount }}</li>
+                        {% endif %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="container">
+        <div class="card-deck mb-3 text-center">
+            <div class="card mb-4 box-shadow">
+                <div class="card-header">
+                    <h4 class="my-0 font-weight-normal">3 уровень</h4>
+                </div>
+                <div class="card-body">
+                    <ul class="list-unstyled mt-3 mb-4">
+                        <li>Количество последователей третьего уровня: {{ third_level_referral_count }}</li>
+                        <li>Активных последователей: {{ third_level_bonus_referral_count }}</li>
+                        {% if request_user.is_superuser %}
+                            <li>За текущий месяц {{ user }} заработал(a): {{ third_level_amount }}</li>
+                        {% else %}
+                            <li>За текущий месяц вы заработали: {{ third_level_amount }}</li>
+                        {% endif %}
+                    </ul>
+                </div>
+            </div>
+            <div class="card mb-4 box-shadow">
+                <div class="card-header">
+                    <h4 class="my-0 font-weight-normal">4 уровень</h4>
+                </div>
+                <div class="card-body">
+                    <ul class="list-unstyled mt-3 mb-4">
+                        <li>Количество последователей четвертого уровня: {{ fourth_level_referral_count }}</li>
+                        <li>Активных последователей: {{ fourth_level_bonus_referral_count }}</li>
+                        {% if request_user.is_superuser %}
+                            <li>За текущий месяц {{ user }} заработал(a): {{ fourth_level_amount }}</li>
+                        {% else %}
+                            <li>За текущий месяц вы заработали: {{ fourth_level_amount }}</li>
+                        {% endif %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+    {# END: Information #}
+
+    {# START: Parent #}
+    <div class="container" id="parent-block">
+        {% include 'parent.html' %}
+    </div>
+    {# END: Parent #}
+
+    {# START: Referrals Tree #}
+    {% if referrals %}
+        <div class="container referrals">
+            <p class="text-center display-4">
+                <i class="fa fa-users text-secondary" aria-hidden="true"></i>
+            </p>
+            <div class="dd" id="referrals">
+                <ol class="dd-list">
+                    {% recursetree referrals %}
+                        <li class="dd-item" data-id="{{ node.id }}">
+                            <div class="dd-nodrag{% if not node.user|payment_status %} not-paid{% endif %}">
+                                {{ node.user }}
+                            </div>
+                            {% if children %}
+                                <ol class="dd-list">
+                                    {{ children }}
+                                </ol>
+                            {% endif %}
+                        </li>
+                    {% endrecursetree %}
+                </ol>
+            </div>
+        </div>
+    {% else %}
+        <div class="container">
+            <div class="alert alert-info text-center" role="alert">
+                {% if request_user.is_superuser %}
+                    <span>На данный момент у {{ user }} нет последователей.</span>
+                {% else %}
+                    <span>На данный момент у вас нет последователей. Пригласите друзей через вашу реферальную ссылку.</span>
+                {% endif %}
+            </div>
+        </div>
+    {% endif %}
+    {# END: Referrals Tree #}
+{% else %}
+    {% if payment_status %}
+        {# START: Information #}
+        <div class="container">
+            <div class="card-deck mb-3 text-center">
+                <div class="card mb-4 box-shadow">
+                    <div class="card-header">
+                        <i class="fa fa-line-chart info-icons" aria-hidden="true"></i>
+                    </div>
+                    <div class="card-body">
+                        <h1 class="card-title pricing-card-title">
+                            {% if last_month_amount %}{{ last_month_amount }}{% else %}0{% endif %}</h1>
+                        <ul class="list-unstyled mt-3 mb-4">
+                            <li>Сумма накопленная за предыдущие месяцы</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="card mb-4 box-shadow" id="current-month-amount-block">
+                    {% include 'current_month_amount.html' %}
+                </div>
+                <div class="card mb-4 box-shadow" id="accumulate-block">
+                    {% include 'accumulate.html' %}
+                </div>
+                <div class="card mb-4 box-shadow" id="amount-block">
+                    {% include 'amount.html' %}
+                </div>
+            </div>
+        </div>
+        <div class="container">
+            <div class="card-deck mb-3 text-center">
+                <div class="card mb-4 box-shadow">
+                    <div class="card-header">
+                        <i class="fa fa-users info-icons" aria-hidden="true"></i>
+                    </div>
+                    <div class="card-body">
+                        <h1 class="card-title pricing-card-title">{{ referrals_count }}</h1>
+                        <ul class="list-unstyled mt-3 mb-4">
+                            {% if request_user.is_superuser %}
+                                <li>Количество последователей</li>
+                            {% else %}
+                                <li>Количество ваших последователей</li>
+                            {% endif %}
+                        </ul>
+                    </div>
+                </div>
+                <div class="card mb-4 box-shadow">
+                    <div class="card-header">
+                        <i class="fa fa-user-plus info-icons" aria-hidden="true"></i>
+                    </div>
+                    <div class="card-body">
+                        <h1 class="card-title pricing-card-title">{{ bonus_referral_count }}</h1>
+                        <ul class="list-unstyled mt-3 mb-4">
+                            <li>Количество активных последователей за этот месяц</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="container">
+            <div class="card-deck mb-3 text-center">
+                <div class="card mb-4 box-shadow">
+                    <div class="card-header">
+                        <h4 class="my-0 font-weight-normal">1 уровень</h4>
+                    </div>
+                    <div class="card-body">
+                        <ul class="list-unstyled mt-3 mb-4">
+                            <li>Количество последователей первого уровня: {{ first_level_referral_count }}</li>
+                            <li>Активных последователей: {{ first_level_bonus_referral_count }}</li>
+                            {% if request_user.is_superuser %}
+                                <li>За текущий месяц {{ user }} заработал(a): {{ first_level_amount }}</li>
+                            {% else %}
+                                <li>За текущий месяц вы заработали: {{ first_level_amount }}</li>
+                            {% endif %}
+                        </ul>
+                    </div>
+                </div>
+                <div class="card mb-4 box-shadow">
+                    <div class="card-header">
+                        <h4 class="my-0 font-weight-normal">2 уровень</h4>
+                    </div>
+                    <div class="card-body">
+                        <ul class="list-unstyled mt-3 mb-4">
+                            <li>Количество последователей второго уровня: {{ second_level_referral_count }}</li>
+                            <li>Активных последователей: {{ second_level_bonus_referral_count }}</li>
+                            {% if request_user.is_superuser %}
+                                <li>За текущий месяц {{ user }} заработал(a): {{ second_level_amount }}</li>
+                            {% else %}
+                                <li>За текущий месяц вы заработали: {{ second_level_amount }}</li>
+                            {% endif %}
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="container">
+            <div class="card-deck mb-3 text-center">
+                <div class="card mb-4 box-shadow">
+                    <div class="card-header">
+                        <h4 class="my-0 font-weight-normal">3 уровень</h4>
+                    </div>
+                    <div class="card-body">
+                        <ul class="list-unstyled mt-3 mb-4">
+                            <li>Количество последователей третьего уровня: {{ third_level_referral_count }}</li>
+                            <li>Активных последователей: {{ third_level_bonus_referral_count }}</li>
+                            {% if request_user.is_superuser %}
+                                <li>За текущий месяц {{ user }} заработал(a): {{ third_level_amount }}</li>
+                            {% else %}
+                                <li>За текущий месяц вы заработали: {{ third_level_amount }}</li>
+                            {% endif %}
+                        </ul>
+                    </div>
+                </div>
+                <div class="card mb-4 box-shadow">
+                    <div class="card-header">
+                        <h4 class="my-0 font-weight-normal">4 уровень</h4>
+                    </div>
+                    <div class="card-body">
+                        <ul class="list-unstyled mt-3 mb-4">
+                            <li>Количество последователей четвертого уровня: {{ fourth_level_referral_count }}</li>
+                            <li>Активных последователей: {{ fourth_level_bonus_referral_count }}</li>
+                            {% if request_user.is_superuser %}
+                                <li>За текущий месяц {{ user }} заработал(a): {{ fourth_level_amount }}</li>
+                            {% else %}
+                                <li>За текущий месяц вы заработали: {{ fourth_level_amount }}</li>
+                            {% endif %}
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {# END: Information #}
+
+        {# START: Parent #}
+        <div class="container" id="parent-block">
+            {% include 'parent.html' %}
+        </div>
+        {# END: Parent #}
+
+        {# START: Referrals Tree #}
+        {% if referrals %}
+            <div class="container referrals">
+                <p class="text-center display-4">
+                    <i class="fa fa-users text-secondary" aria-hidden="true"></i>
+                </p>
+                <div class="dd" id="referrals">
+                    <ol class="dd-list">
+                        {% recursetree referrals %}
+                            <li class="dd-item" data-id="{{ node.id }}">
+                                <div class="dd-nodrag{% if not node.user|payment_status %} not-paid{% endif %}">
+                                    {{ node.user }}
+                                </div>
+                                {% if children %}
+                                    <ol class="dd-list">
+                                        {{ children }}
+                                    </ol>
+                                {% endif %}
+                            </li>
+                        {% endrecursetree %}
+                    </ol>
+                </div>
+            </div>
+        {% else %}
+            <div class="container">
+                <div class="alert alert-info text-center" role="alert">
+                    {% if request_user.is_superuser %}
+                        <span>На данный момент у {{ user }} нет последователей.</span>
+                    {% else %}
+                        <span>На данный момент у вас нет последователей. Пригласите друзей через вашу реферальную ссылку.</span>
+                    {% endif %}
+                </div>
+            </div>
+        {% endif %}
+        {# END: Referrals Tree #}
+    {% else %}
+        {# START: No Payment Section #}
+        <div class="container-fluid text-center mt-3">
+            <div class="alert alert-danger" role="alert">
+                <i class="fa fa-info-circle" aria-hidden="true"></i>&nbsp;<span>Вы не оплатили за текущий месяц! После оплаты будет доступна вся информация.</span>
+            </div>
+        </div>
+        {# END: No Payment Section #}
+    {% endif %}
+{% endif %}

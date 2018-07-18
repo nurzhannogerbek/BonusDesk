@@ -1,0 +1,27 @@
+{% load i18n %}
+
+<form method="post" action="{% url 'specify_parent' %}" class='specify-parent-form' enctype="multipart/form-data">
+    {% csrf_token %}
+    <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLongTitle">Укажите почту того, кто вас пригласил в систему</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <i class="fa fa-times"></i>
+        </button>
+      </div>
+    <div class="modal-body">
+        <div class="form-group input-group mb-0">
+            <div class="input-group-prepend">
+                <span class="input-group-text">
+                    <i class="fa fa-envelope"></i>
+                </span>
+            </div>
+            {{ specify_parent_form.email }}
+        </div>
+        <div class="alert alert-danger specify-parent-alert" role="alert">
+            <span>Пользователя с подобной электронной почтой нет в системе.</span>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button type="submit" class="btn btn-success">Сохранить</button>
+    </div>
+</form>

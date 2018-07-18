@@ -1,0 +1,12 @@
+<div class="card-header">
+    <i class="fa fa-area-chart info-icons" aria-hidden="true"></i>
+</div>
+<div class="card-body">
+    <h2 class="card-title pricing-card-title">{{ accumulate_status }}</h2>
+    <ul class="list-unstyled mt-3 mb-4">
+        <li>{{ accumulate_text }}</li>
+        {% if accumulate %}
+            <li>{{ accumulate }}</li>
+        {% endif %}
+    </ul>
+</div>

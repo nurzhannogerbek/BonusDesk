@@ -1,0 +1,27 @@
+{% if parent %}
+    <div class="alert alert-primary text-center" role="alert">
+        {% if request_user.is_superuser %}
+            <span>В бонусную систему {{ user }} пригласил(a):</span>&nbsp;<strong>{{ parent }}.</strong>
+            <br>
+            <span>{{ user }} получает {{ amount_from_parent }} от {{ parent }}</span>
+        {% else %}
+            <span>В бонусную систему вас пригласил(a):</span>&nbsp;<strong>{{ parent }}.</strong>
+            <br>
+            <span>Вы получаете: {{ amount_from_parent }}</span>
+        {% endif %}
+    </div>
+{% else %}
+    <div class="alert alert-primary text-center" role="alert">
+        {% if request_user.is_superuser %}
+            <span>В бонусную систему {{ user }} пришел сам.</span>
+        {% else %}
+            <span>В систему вы пришли не по реферальной ссылке.</span>
+            <br>
+            <span>Вы можете указать человека по совету которого пришли в систему и получить за это свои бонусы.</span>
+            <br>
+            <button type="button" class="btn btn-lg btn-primary mt-2 specify-parent-btn" data-url="{% url 'specify_parent' %}">
+                <span>Указать</span>
+            </button>
+        {% endif %}
+    </div>
+{% endif %}

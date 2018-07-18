@@ -1,0 +1,237 @@
+{% extends "base.html" %}
+
+{% load static %}}
+
+{% block title %}Регистрация{% endblock %}
+
+{% block style %}
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datetimepicker/4.17.47/css/bootstrap-datetimepicker.css" type="text/css" media="all" rel="stylesheet"/>
+    <link rel="stylesheet" type="text/css" href="{% static 'bootstrap_datepicker_plus/css/datepicker-widget.css' %}">
+    <style>
+        body {
+            background-color: #9f92c8;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100%25' height='100%25' viewBox='0 0 1600 900'%3E%3Cpath fill='%23c3bce2' d='M0 504 0 899 1600 899 1600 120z'/%3E%3Cpath fill='%23cca3f3' d='M1600 567 1600 899 0 899 0 165z'/%3E%3Cpath fill='%233d689d' d='M0 680 0 899 1600 899 1600 300z'/%3E%3Cpath fill='%239e6fb6' d='M1600 719 1600 899 0 899 0 353z'/%3E%3Cpath fill='%23905cb5' d='M0 788 0 899 1600 899 1600 625z'/%3E%3C/svg%3E");
+            background-attachment: fixed;
+            background-size: cover;
+            background-position: center;
+        }
+        .datepicker {
+            z-index: 1200 !important;
+        }
+        .bootstrap-datetimepicker-widget.dropdown-menu:before, .bootstrap-datetimepicker-widget.dropdown-menu:after {
+            content: unset !important;
+        }
+        .bootstrap-datetimepicker-widget.dropdown-menu {
+            width: 100%;
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+        <div class="container w-100 mt-5 mb-5">
+            <div class="card">
+                <article class="card-body">
+                    <h4 class="card-title mt-3 text-center">Создай свою учетную запись</h4>
+                    <p class="text-center">
+                        <span>Начни прямо сейчас</span>
+                    </p>
+                    <form method="post">
+                        {% csrf_token %}
+                        <div class="form-group input-group">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text">
+                                    <i class="fa fa-user"></i>
+                                </span>
+                            </div>
+                            {{ form.username }}
+                        </div>
+                        <div class="row">
+                            <div class="col-sm">
+                                <div class="form-group input-group">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text">
+                                            <i class="fa fa-user"></i>
+                                        </span>
+                                    </div>
+                                    {{ form.first_name }}
+                                </div>
+                            </div>
+                            <div class="col-sm">
+                                <div class="form-group input-group">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text">
+                                            <i class="fa fa-user"></i>
+                                        </span>
+                                    </div>
+                                    {{ form.last_name }}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm">
+                                <div class="form-group input-group">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text">
+                                            <i class="fa fa-user"></i>
+                                        </span>
+                                    </div>
+                                    {{ form.middle_name }}
+                                </div>
+                            </div>
+                            <div class="col-sm">
+                                <div class="form-group input-group">
+                                    <div class="input-group-prepend">
+                                            <span class="input-group-text">
+                                                <i class="fa fa-envelope"></i>
+                                            </span>
+                                    </div>
+                                    {{ form.email }}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm">
+                                <div class="form-group input-group">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text">
+                                            <i class="fa fa-unlock-alt"></i>
+                                        </span>
+                                    </div>
+                                    {{ form.password }}
+                                </div>
+                            </div>
+                            <div class="col-sm">
+                                <div class="form-group input-group mb-0">
+                                    <div class="input-group-prepend">
+                                            <span class="input-group-text">
+                                                <i class="fa fa-unlock-alt"></i>
+                                            </span>
+                                    </div>
+                                    {{ form.password_confirm }}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm">
+                                <label class='font-weight-bold custom-label' for="{{ form.birth_date.id_for_label }}">{{ form.birth_date.label }}</label>
+                                {{ form.birth_date }}
+                            </div>
+                            <div class="col-sm">
+                                <label class='font-weight-bold custom-label'
+                                       for="{{ form.phone_number.id_for_label }}">{{ form.phone_number.label }}</label>
+                                <div class="form-group input-group mb-0">
+                                    <div class="input-group-prepend">
+                                            <span class="input-group-text">
+                                                <i class="fa fa-phone"></i>
+                                            </span>
+                                    </div>
+                                    {{ form.phone_number }}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="alert alert-info text-center p-2 mt-3 mb-3">
+                            <span>Введите номер телефона в соответствии со следующим форматом: +(код страны) (номер телефона). Например: +7 705 741 96 36</span>
+                        </div>
+                        <label class='font-weight-bold custom-label'
+                               for="{{ form.address.id_for_label }}">{{ form.address.label }}</label>
+                        <div class="form-group input-group">
+                            <div class="input-group-prepend">
+                                    <span class="input-group-text">
+                                        <i class="fa fa-map-marker"></i>
+                                    </span>
+                            </div>
+                            {{ form.address }}
+                        </div>
+                        <div class="form-group">
+                            <button type="submit" class="btn btn-primary btn-block">
+                                <i class="fa fa-plug" aria-hidden="true"></i>&nbsp;<span>Зарегистрироваться</span>
+                            </button>
+                        </div>
+
+                        {% if form.email.errors %}
+                            <div class="form-group error-message">
+                                <div class="alert alert-danger" role="alert">
+                                    <ul class="list-unstyled">
+                                        {% for error in form.email.errors %}
+                                            <li class="text-danger text-center">
+                                                <i class="fa fa-exclamation-circle"></i>&nbsp;<strong>{{ error|escape }}</strong>
+                                            </li>
+                                        {% endfor %}
+                                    </ul>
+                                </div>
+                            </div>
+                        {% endif %}
+                        {% if form.username.errors %}
+                            <div class="form-group error-message">
+                                <div class="alert alert-danger" role="alert">
+                                    <ul class="list-unstyled">
+                                        {% for error in form.username.errors %}
+                                            <li class="text-danger text-center">
+                                                <i class="fa fa-exclamation-circle"></i>&nbsp;<strong>{{ error|escape }}</strong>
+                                            </li>
+                                        {% endfor %}
+                                    </ul>
+                                </div>
+                            </div>
+                        {% endif %}
+                        {% if form.phone_number.errors %}
+                            <div class="form-group error-message">
+                                <div class="alert alert-danger" role="alert">
+                                    <ul class="list-unstyled">
+                                        {% for error in form.phone_number.errors %}
+                                            <li class="text-danger text-center">
+                                                <i class="fa fa-exclamation-circle"></i>&nbsp;<strong>{{ error|escape }}</strong>
+                                            </li>
+                                        {% endfor %}
+                                    </ul>
+                                </div>
+                            </div>
+                        {% endif %}
+                        {% if form.birth_date.errors %}
+                            <div class="form-group error-message">
+                                <div class="alert alert-danger" role="alert">
+                                    <ul class="list-unstyled">
+                                        {% for error in form.birth_date.errors %}
+                                            <li class="text-danger text-center">
+                                                <i class="fa fa-exclamation-circle"></i>&nbsp;<strong>{{ error|escape }}</strong>
+                                            </li>
+                                        {% endfor %}
+                                    </ul>
+                                </div>
+                            </div>
+                        {% endif %}
+                        {% if form.non_field_errors %}
+                            <div class="form-group error-message">
+                                <div class="alert alert-danger" role="alert">
+                                    <ul class="list-unstyled">
+                                        {% for error in form.non_field_errors %}
+                                            <li class="text-danger text-center">
+                                                <i class="fa fa-exclamation-circle"></i>&nbsp;<strong>{{ error|escape }}</strong>
+                                            </li>
+                                        {% endfor %}
+                                    </ul>
+                                </div>
+                            </div>
+                        {% endif %}
+                        <p class="text-center p-text-info">
+                            <span>Уже есть учетная запись?</span>&nbsp;<a href="{% url 'account_login' %}" style="text-decoration: none;">Войти</a>
+                        </p>
+
+                    </form>
+                </article>
+            </div>
+        </div>
+{% endblock %}
+
+{% block script %}
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.9.0/moment-with-locales.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datetimepicker/4.17.47/js/bootstrap-datetimepicker.min.js"></script>
+    <script src="{% static 'bootstrap_datepicker_plus/js/datepicker-widget.js' %}"></script>
+    <script>
+        $(document).ready(function () {
+            setTimeout(function () {
+                $('.error-message').fadeOut(2000);
+            }, 10000);
+        });
+    </script>
+{% endblock %}

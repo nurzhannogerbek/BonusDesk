@@ -1,0 +1,91 @@
+{% extends "base.html" %}
+
+{% load static %}
+{% load widget_tweaks %}
+
+{% block title %}Войти в систему{% endblock %}
+
+{% block style %}
+    <style>
+        body {
+            overflow: hidden;
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center; /*centers items on the line (the x-axis by default)*/
+            align-items: center; /*centers items on the cross-axis (y by default)*/
+            background-color: #9f92c8;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100%25' height='100%25' viewBox='0 0 1600 900'%3E%3Cpath fill='%23c3bce2' d='M0 504 0 899 1600 899 1600 120z'/%3E%3Cpath fill='%23cca3f3' d='M1600 567 1600 899 0 899 0 165z'/%3E%3Cpath fill='%233d689d' d='M0 680 0 899 1600 899 1600 300z'/%3E%3Cpath fill='%239e6fb6' d='M1600 719 1600 899 0 899 0 353z'/%3E%3Cpath fill='%23905cb5' d='M0 788 0 899 1600 899 1600 625z'/%3E%3C/svg%3E");
+            background-attachment: fixed;
+            background-size: cover;
+            background-position: center;
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+    <div class="container w-100">
+        <div class="card">
+            <article class="card-body">
+                <a href="{% url 'account_signup' %}" class="float-right btn btn-outline-primary signup-btn">
+                    <i class="fa fa-sign-in" aria-hidden="true"></i>&nbsp;<span>Регистрация</span>
+                </a>
+                <h4 class="card-title mb-4 mt-1">Авторизация</h4>
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="form-group">
+                        <div class="input-group">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text"><i class="fa fa-user"></i></span>
+                            </div>
+                            {% render_field form.username|add_class:"form-control" placeholder="Имя пользователя" %}
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="input-group">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text"><i class="fa fa-lock"></i></span>
+                            </div>
+                            {% render_field form.password|add_class:"form-control" placeholder="Пароль" %}
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <button type="submit" class="btn btn-primary btn-block">
+                            <i class="fa fa-plug" aria-hidden="true"></i>&nbsp;<span>Войти</span>
+                        </button>
+                    </div>
+                    {% if form.non_field_errors %}
+                        <div class="form-group error-message">
+                            <div class="alert alert-danger" role="alert">
+                                <ul class="list-unstyled">
+                                    {% for error in form.non_field_errors %}
+                                        <li class="text-danger text-center">
+                                            <i class="fa fa-exclamation-circle"></i>&nbsp;<strong>{{ error|escape }}</strong>
+                                        </li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                        </div>
+                    {% endif %}
+                    <p class="text-center p-text-info">
+                        <a href="{% url 'account_password_reset' %}" class="btn">
+                            <i class="fa fa-question-circle" aria-hidden="true"></i>&nbsp;<span>Забыли пароль?</span>
+                        </a>
+                    </p>
+                    <input type="hidden" name="next" value="{{ next }}"/>
+                </form>
+            </article>
+        </div>
+    </div>
+{% endblock %}
+
+{% block script %}
+    <script>
+        $(document).ready(function () {
+            setTimeout(function () {
+                $('.error-message').fadeOut(2000);
+            }, 10000);
+        });
+    </script>
+{% endblock %}
